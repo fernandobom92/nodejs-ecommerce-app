@@ -1,0 +1,30 @@
+[
+  {
+    "email": "test@test.com"
+  },
+  {
+    "email": "fernandobom92@gmail.com",
+    "password": "teste1",
+    "id": "226dffde"
+  },
+  {
+    "email": "",
+    "password": "",
+    "id": "d245a090"
+  },
+  {
+    "email": "test3@test.com",
+    "password": "senha3",
+    "id": "055cffb3"
+  },
+  {
+    "email": "test4@test.com",
+    "password": "b6c92696dddee4ba53607c39440c7b182f9ac0e551fddfad6e0cccbf03ff0b76ff9870d1f7f2b3499e73a4e146e36caace5875569662c7fd1bb821ba5ed31d03.69726892f84d1ba0",
+    "id": "ac0a3b7b"
+  },
+  {
+    "email": "test5@test.com",
+    "password": "aa306922ccb89ca7292c1d088d61b0c541a047b06c10b0699c3de38cc013f8769067e0f365111253ed8e1aa1f51cbb5eb0e8deac20cb4aa6df8f82062b679ef7.68075ff8cb2278a5",
+    "id": "f6ba9c01"
+  }
+]
