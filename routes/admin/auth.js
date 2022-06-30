@@ -3,45 +3,35 @@ const { check, validationResult } = require('express-validator'); //colchetes se
 const usersRepo = require('../../repositories/users.js');
 const signupTemplate = require('../../views/admin/auth/signup.js');
 const signinTemplate = require('../../views/admin/auth/signin.js');
-
+const { 
+    requireEmail, 
+    requirePassword, 
+    requirePasswordConfirmation, 
+    requireEmailExists,
+    requireValidPasswordForUser
+} = require('./validation.js');
 const router = express.Router();
 
-
-router.get('/signup', (req, res) =>{
+router.get('/signup', (req, res) => {
     res.send(signupTemplate({ req }));
 });
 
-router.post('/signup', 
-    [
-        check('email').trim().normalizeEmail().isEmail(),
-        check('password').trim().isLength({ min:4, max:20}),
-        check('passwordConfirmation').trim().isLength({ min: 4, max: 20 })
-    ], 
-    async (req,res) =>{
-    const errors = validationResult(req);
-    console.log(errors); 
+router.post('/signup', [ requireEmail, requirePassword, requirePasswordConfirmation ],     
+    async (req,res) => {
+        const errors = validationResult(req);
+        
+        if (!errors.isEmpty()) {
+            return res.send(signupTemplate({ req, errors })); //exporta erros somente se houver algum erro de validação
+        }
 
-    //recebe os campos do form HTML
-    const { email, password, passwordConfirmation} = req.body; 
+        const { email, password, passwordConfirmation} = req.body; 
+        const user = await usersRepo.create({ email, password });
 
-    const existingUser = await usersRepo.getOneBy({ email });
+        req.session.userId = user.id;
 
-    if(existingUser) {
-        return res.send('Este email já está sendo usado')
+        res.send('<h1>Conta criada!</h1>');
     }
-
-    if (password !== passwordConfirmation) {
-        return res.send('Senhas informadas tem que ser iguais')
-    }
-
-    //cria um usuario
-
-    const user = await usersRepo.create({ email, password });
-
-    //armazena o ID do usuario em um cookie
-    req.session.userId = user.id;
-    res.send('<h1>Conta criada!</h1>');
-});
+);
 
 router.get('/signout', (req, res) => {
     req.session = null;
@@ -49,27 +39,24 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/signin', (req,res) => {
-    res.send(signinTemplate());
+    res.send(signinTemplate({}));
 });
 
-router.post('/signin', async (req, res) => {
-    const { email, password } = req.body;
+router.post('/signin', [ requireEmailExists, requireValidPasswordForUser ], 
+    async (req, res) => {
+        const errors = validationResult(req);
 
-    const user = await usersRepo.getOneBy({ email: email });
+        if (!errors.isEmpty()) {
+            return res.send(signinTemplate({ errors }));
+        }
 
-    if (!user) {
-        return res.send('Email não encontrado');        
-    }
+        const { email } = req.body;
 
-    const validPassword = await usersRepo.comparePasswords( user.password, password );
+        const user = await usersRepo.getOneBy({ email });
 
-    if (!validPassword) {
-        return res.send('senha incorreta');
-    }
+        req.session.userId = user.id;
 
-    req.session.userId = user.id;
-
-    res.send('Você está logado corretamente!');
+        res.send('Logado corretamente!');
 });
 
 module.exports = router;
