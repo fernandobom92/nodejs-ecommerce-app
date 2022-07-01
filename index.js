@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cookieSession = require('cookie-session');
 const authRouter = require('./routes/admin/auth.js');
+const productsRouter = require('./routes/admin/products.js');
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(
 );
 
 app.use(authRouter);
+app.use(productsRouter);
 
 //começa a ouvir a porta 3000, envia uma HTTP request
 app.listen(3000, () =>{
