@@ -39,7 +39,7 @@ router.get('/signout', (req, res) => {
 });
 
 router.get('/signin', (req,res) => {
-    res.send(signinTemplate({}));
+    res.send(signinTemplate({})); //objeto vazio evita erros ao receber argumentos vazios
 });
 
 router.post('/signin', [ requireEmailExists, requireValidPasswordForUser ], 
