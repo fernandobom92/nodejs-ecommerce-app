@@ -2,6 +2,15 @@ const { check } = require('express-validator');
 const usersRepo = require('../../repositories/users.js');
 
 module.exports = {
+    requireTitle: check('title')
+        .trim()
+        .isLength({ min:5, max:40 })
+        .withMessage('Precisa ter entre 5 e 40 caracteres'),
+    requirePrice: check('price')
+        .trim()
+        .toFloat() //converte para numeros fracionados, tambem pode ser usado toInt() para numeros inteiros
+        .isFloat({ min:1 })
+        .withMessage('O preço do produto tem que ser maior que 1'), //valor minimo para o produto
     requireEmail: check('email')
         .trim()
         .normalizeEmail()
