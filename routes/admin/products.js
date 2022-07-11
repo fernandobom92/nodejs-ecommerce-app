@@ -5,6 +5,7 @@ const { handleErrors, requireAuth } = require('./middlewares');
 const productsRepo = require('../../repositories/products');
 const productsNewTemplate = require('../../views/admin/products/new');
 const productsIndexTemplate = require('../../views/admin/products/index');
+const productsEditTemplate = require('../../views/admin/products/edit');
 const { requireTitle, requirePrice } = require('./validation');
 
 const router = express.Router();
@@ -41,5 +42,45 @@ router.post(
         res.redirect('/admin/products');
     }
 );
+
+router.get('/admin/products/:id/edit', requireAuth, async (req, res) => {
+    const product = await productsRepo.getOne(req.params.id);
+
+    if (!product) {
+        return res.send('Produto não encontrado');
+    }
+
+    res.send(productsEditTemplate({ product }));
+});
+
+router.post('/admin/products/:id/edit', 
+    requireAuth,
+    upload.single('image'), //captura o name="image" vindo do formulario
+    [requireTitle, requirePrice],
+    handleErrors(productsEditTemplate, async req => {
+        const product = await productsRepo.getOne(req.params.id);
+        return { product };
+    }),
+    async (req,res) => {
+        const changes = req.body;
+
+        if(req.file) { //se o usuario forneceu uma nova imagem
+            changes.image = req.file.buffer.toString('base64');
+        }
+
+        try {
+            await productsRepo.update(req.params.id, changes)
+        } catch (err) {
+            return res.send('Produto não encontrado');
+        }
+
+        res.redirect('/admin/products');
+    }
+);
+
+router.post('/admin/products/:id/delete', requireAuth, async (req,res) => {
+    await productsRepo.delete(req.params.id);
+    res.redirect('/admin/products');
+});
 
 module.exports = router;
