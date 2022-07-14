@@ -4,6 +4,7 @@ const cookieSession = require('cookie-session');
 const authRouter = require('./routes/admin/auth.js');
 const adminProductsRouter = require('./routes/admin/products.js');
 const productsRouter = require('./routes/products');
+const cartsRouter = require('./routes/carts');
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(
 app.use(authRouter);
 app.use(productsRouter);
 app.use(adminProductsRouter);
+app.use(cartsRouter);
 
 //começa a ouvir a porta 3000, envia uma HTTP request
 app.listen(3000, () =>{
